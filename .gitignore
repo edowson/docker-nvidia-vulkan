@@ -1,0 +1,24 @@
+# .gitignore
+
+# archive files
+*.bz2
+*.gz
+*.zip
+*.tar
+
+# common
+*.log
+
+# jetbrains ide
+*.iml
+.idea/
+
+# folders
+archive/
+backup/
+output/
+
+# Operating system files
+~*.*
+.DS_Store
+Thumbs.db
