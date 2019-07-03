@@ -208,8 +208,8 @@ WORKDIR $HOME
 
 # labels
 LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.name="edowson/vulkan-base/cudagl:$BUILD_VERSION-$CUDA_MAJOR_VERSION-xenial"
-LABEL org.label-schema.description="Vulkan SDK $BUILD_VERSION with NVIDIA CUDA-$CUDA_VERSION CUDNN-$CUDNN_VERSION - Ubuntu-16.04."
+LABEL org.label-schema.name="edowson/vulkan-base/cudagl:$BUILD_VERSION-$CUDA_MAJOR_VERSION-bionic"
+LABEL org.label-schema.description="Vulkan SDK $BUILD_VERSION with NVIDIA CUDA-$CUDA_VERSION CUDNN-$CUDNN_VERSION - Ubuntu-18.04."
 LABEL org.label-schema.version=$BUILD_VERSION
 LABEL org.label-schema.docker.cmd="xhost +local:root \
 docker run -it \
@@ -225,10 +225,10 @@ docker run -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro \
   -v ${XDG_RUNTIME_DIR}/pulse/native:/run/user/1000/pulse/native \
-  -v ~/mount/project:~/project \
+  -v ~/mount/project:/home/$USER/project \
   --rm \
-  --name vulkan-base-cudagl-$BUILD_VERSION-$CUDA_MAJOR_VERSION-xenial \
-  edowson/vulkan-base/cudagl:$BUILD_VERSION-$CUDA_MAJOR_VERSION-xenial \
+  --name vulkan-base-cudagl-$BUILD_VERSION-$CUDA_MAJOR_VERSION-bionic \
+  edowson/vulkan-base/cudagl:$BUILD_VERSION-$CUDA_MAJOR_VERSION-bionic \
 xhost -local:root"
 
 # update .bashrc
