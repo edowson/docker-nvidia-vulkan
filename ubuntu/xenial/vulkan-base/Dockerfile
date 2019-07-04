@@ -183,6 +183,16 @@ RUN wget -q --show-progress --progress=bar:force:noscroll http://us.download.nvi
     && cp /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION/libnvidia-glvkspirv.so.$NVIDIA_DRIVER_VERSION /usr/lib/x86_64-linux-gnu/ \
     && rm -rf /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION.run
 
+# install packages and libraries for jetbrains ide
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TERM=linux apt-get install --no-install-recommends -q -y \
+    # java jdk \
+    openjdk-8-jdk \
+    # gtk support \
+    libcanberra-gtk-module \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # create user
 ARG USER
 ARG UID
@@ -226,7 +236,10 @@ docker run -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro \
   -v ${XDG_RUNTIME_DIR}/pulse/native:/run/user/1000/pulse/native \
-  -v ~/mount/project:/home/$USER/project \
+  -v ~/mount/backup:/backup \
+  -v ~/mount/data:/data \
+  -v ~/mount/project:/project \
+  -v ~/mount/tool:/tool \
   --rm \
   --name vulkan-base-cudagl-$BUILD_VERSION-$CUDA_MAJOR_VERSION-xenial \
   edowson/vulkan-base/cudagl:$BUILD_VERSION-$CUDA_MAJOR_VERSION-xenial \

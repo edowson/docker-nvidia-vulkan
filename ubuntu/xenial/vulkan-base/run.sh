@@ -58,7 +58,10 @@ docker run -it \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro \
   -v ${XDG_RUNTIME_DIR}/pulse/native:/run/user/1000/pulse/native \
-  -v ~/mount/project:/home/${USER}/project \
+  -v ~/mount/backup:/backup \
+  -v ~/mount/data:/data \
+  -v ~/mount/project:/project \
+  -v ~/mount/tool:/tool \
   --rm \
   --name ${IMAGE}-${TAG} \
   ${REPOSITORY}:${TAG} bash
