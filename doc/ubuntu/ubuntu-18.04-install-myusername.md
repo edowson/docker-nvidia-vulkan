@@ -10,6 +10,9 @@ This document outlines the setup procedure for Ubuntu-18.04. If you intend to se
 
 Download the iso and verify the checksum
 ```bash
+# ubuntu
+sha256sum ubuntu-18.04.2-desktop-amd64.iso
+
 # macosx
 shasum -a 256 ubuntu-18.04.2-desktop-amd64.iso
 ```
