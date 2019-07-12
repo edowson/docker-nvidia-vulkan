@@ -7,7 +7,7 @@ This repository contains NVIDIA GPU accelerated docker image files for working w
 ## Ubuntu Host OS installation
 
 Setup your Ubuntu Host OS, install NVIDIA docker 2 with configure docker user-namespace remapping.
-- [Ubuntu-18.04 installation guide](./doc/ubuntu/ubuntu-18.04-install-myusername.md)
+- [Ubuntu-18.04 host installation guide](./doc/ubuntu/ubuntu-18.04-install-myusername.md)
 
 
 ## Running JetBrains IDE from within a docker container
