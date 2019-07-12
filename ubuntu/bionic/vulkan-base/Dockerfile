@@ -5,9 +5,6 @@ ARG TAG
 FROM ${REPOSITORY}:${TAG}
 LABEL maintainer "Elvis Dowson <elvis.dowson@gmail.com>"
 
-# args
-ARG BUILD_VERSION
-
 # setup environment variables
 ENV container docker
 ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
@@ -115,6 +112,7 @@ RUN apt-get update \
     libpciaccess0 \
     libpng-dev \
     libwayland-dev \
+    libxcb-ewmh-dev \
     libxcb-dri3-0 \
     libxcb-dri3-dev \
     libxcb-present0 \
@@ -161,17 +159,25 @@ RUN CONDA_BASE_PACKAGE_NAME=`echo $CONDA_BASE_PACKAGE | sed -r 's/\<./\U&/g'` \
     && ARCH=`uname -m` \
     && CONDA_INSTALL_PACKAGE=$CONDA_BASE_PACKAGE_NAME$CONDA_PYTHON_VERSION-$CONDA_VERSION-$OS-$ARCH.sh \
     && echo "installing $CONDA_INSTALL_PACKAGE" \
-    && wget -q --show-progress --progress=bar:force:noscroll https://repo.anaconda.com/archive/$CONDA_INSTALL_PACKAGE -O /tmp/$CONDA_BASE_PACKAGE.sh \
+    && if [ $CONDA_BASE_PACKAGE_NAME = 'Anaconda' ]; then \
+         wget -q --show-progress --progress=bar:force:noscroll https://repo.anaconda.com/archive/$CONDA_INSTALL_PACKAGE -O /tmp/$CONDA_BASE_PACKAGE.sh ;\
+       fi \
+    && if [ $CONDA_BASE_PACKAGE_NAME = 'Miniconda' ]; then \
+         wget -q --show-progress --progress=bar:force:noscroll https://repo.continuum.io/miniconda/$CONDA_INSTALL_PACKAGE -O /tmp/$CONDA_BASE_PACKAGE.sh ;\
+       fi \
     && bash /tmp/$CONDA_BASE_PACKAGE.sh -b -p /opt/$CONDA_BASE_PACKAGE$CONDA_PYTHON_VERSION \
     && rm /tmp/$CONDA_BASE_PACKAGE.sh
 
 # install vulkan sdk
-RUN echo "downloading Vulkan SDK $BUILD_VERSION" \
-    && wget -q --show-progress --progress=bar:force:noscroll https://sdk.lunarg.com/sdk/download/$BUILD_VERSION/linux/vulkansdk-linux-$BUILD_VERSION.tar.gz -O /tmp/vulkansdk-linux-x86_64-$BUILD_VERSION.tar.gz \
-    && echo "installing Vulkan SDK $BUILD_VERSION" \
+ARG BUILD_VERSION
+ARG VULKAN_SDK_VERSION
+ENV VULKAN_SDK_VERSION=$VULKAN_SDK_VERSION
+RUN echo "downloading Vulkan SDK $VULKAN_SDK_VERSION" \
+    && wget -q --show-progress --progress=bar:force:noscroll https://sdk.lunarg.com/sdk/download/$VULKAN_SDK_VERSION/linux/vulkansdk-linux-$VULKAN_SDK_VERSION.tar.gz -O /tmp/vulkansdk-linux-x86_64-$VULKAN_SDK_VERSION.tar.gz \
+    && echo "installing Vulkan SDK $VULKAN_SDK_VERSION" \
     && mkdir -p /opt/vulkan \
-    && tar -xf /tmp/vulkansdk-linux-x86_64-$BUILD_VERSION.tar.gz -C /opt/vulkan \
-    && rm /tmp/vulkansdk-linux-x86_64-$BUILD_VERSION.tar.gz
+    && tar -xf /tmp/vulkansdk-linux-x86_64-$VULKAN_SDK_VERSION.tar.gz -C /opt/vulkan \
+    && rm /tmp/vulkansdk-linux-x86_64-$VULKAN_SDK_VERSION.tar.gz
 
 # install nvidia driver
 ARG NVIDIA_DRIVER_VERSION
@@ -179,7 +185,9 @@ ENV NVIDIA_DRIVER_VERSION $NVIDIA_DRIVER_VERSION
 RUN wget -q --show-progress --progress=bar:force:noscroll http://us.download.nvidia.com/XFree86/Linux-x86_64/$NVIDIA_DRIVER_VERSION/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION.run -O /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION.run \
     && cd /tmp \
     && sh NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION.run --extract-only \
+    && cp /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION/libnvidia-cbl.so.$NVIDIA_DRIVER_VERSION /usr/lib/x86_64-linux-gnu/ \
     && cp /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION/libnvidia-glvkspirv.so.$NVIDIA_DRIVER_VERSION /usr/lib/x86_64-linux-gnu/ \
+    && cp /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION/libnvidia-rtcore.so.$NVIDIA_DRIVER_VERSION /usr/lib/x86_64-linux-gnu/ \
     && rm -rf /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION /tmp/NVIDIA-Linux-x86_64-$NVIDIA_DRIVER_VERSION.run
 
 # install packages and libraries for jetbrains ide
@@ -245,7 +253,6 @@ docker run -it \
 xhost -local:root"
 
 # update .bashrc
-ENV VULKAN_SDK_VERSION=$BUILD_VERSION
 RUN echo \
 'CUDA="/usr/local/cuda-${CUDA_MAJOR_VERSION}"\n\
 export PS1="${debian_chroot:+($debian_chroot)}\u:\W\$ "\n\
