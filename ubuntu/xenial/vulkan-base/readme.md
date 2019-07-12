@@ -47,3 +47,10 @@ vulkan-smoketest
 ```
 
 **Note:** The Ubuntu-16.04 Vulkan SDK docker image requires the additional installation of the `libxcb-glx0` package, when compared to the Ubuntu-18.04 Vulkan SDK docker image.
+
+## List libraries
+
+List nvidia libraries
+```bash
+ls -la /usr/lib/x86_64-linux-gnu/*nvidia*
+```
